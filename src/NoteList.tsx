@@ -1,19 +1,42 @@
-import { useState } from "react";
-import { Button, Col, Row, Stack, Form } from "react-bootstrap";
+import { useMemo, useState } from "react";
+import { Button, Col, Row, Stack, Form, Card, Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import ReactSelect from "react-select";
-import { Tag } from "./App";
+import { Note, Tag } from "./App";
+
+import styles from "./NoteList.module.css";
 
 type NoteListProps = {
-    availableTags: Tag[]
-}
+  availableTags: Tag[];
+  notes: Note[];
+};
 
-export function NoteList({ availableTags }: NoteListProps) {
+type SimplifiedNote = {
+  tags: Tag[];
+  title: string;
+  id: string;
+};
+
+export function NoteList({ availableTags, notes }: NoteListProps) {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [title, setTitle] = useState("");
+
+  const filteredNotes = useMemo(() => {
+    return notes.filter((note) => {
+      return (
+        (title === "" ||
+          note.title.toLowerCase().includes(title.toLowerCase())) &&
+        (selectedTags.length === 0 ||
+          selectedTags.every((tag) =>
+            note.tags.some((noteTag) => noteTag.id === tag.id)
+          ))
+      );
+    });
+  }, [title, notes, selectedTags]);
 
   return (
     <>
-      <Row>
+      <Row className="align-items-center mb-4">
         <Col>
           <h1>Notes</h1>
         </Col>
@@ -26,12 +49,16 @@ export function NoteList({ availableTags }: NoteListProps) {
           </Stack>
         </Col>
       </Row>
-      <Form>
+      <Form className="mb-4">
         <Row>
           <Col>
             <Form.Group controlId={"title"}>
               <Form.Label>Title</Form.Label>
-              <Form.Control type="text" />
+              <Form.Control
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
             </Form.Group>
           </Col>
           <Col>
@@ -63,6 +90,43 @@ export function NoteList({ availableTags }: NoteListProps) {
           </Col>
         </Row>
       </Form>
+      <Row className="g-3" xs={1} sm={2} lg={3} xl={4}>
+        {filteredNotes.map((note) => (
+          <Col key={note.id}>
+            <NoteCard id={note.id} title={note.title} tags={note.tags} />
+          </Col>
+        ))}
+      </Row>
     </>
   );
 }
+
+const NoteCard = ({ id, title, tags }: SimplifiedNote) => {
+  return (
+    <Card
+      as={Link}
+      to={`/${id}`}
+      className={`h-100 text-reset text-decoration-none ${styles.card}`}
+    >
+      <Card.Body>
+        <Stack
+          gap={2}
+          className="align-items-center justift-content-center h-100"
+        >
+          <span className="fs-5">{title}</span>
+          {tags.length > 0 && (
+            <Stack
+              gap={1}
+              direction="horizontal"
+              className="justify-content-center flex-wrap"
+            >
+              {tags.map((tag) => (
+                <Badge className="txt-truncate">{tag.label}</Badge>
+              ))}
+            </Stack>
+          )}
+        </Stack>
+      </Card.Body>
+    </Card>
+  );
+};

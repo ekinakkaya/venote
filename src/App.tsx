@@ -6,7 +6,6 @@ import { useMemo } from "react";
 import { useLocalStorage } from "./useLocalStorage";
 import { v4 as uuidV4 } from "uuid";
 import { NoteList } from "./NoteList";
-import { shouldAllowVerticalAlign } from "@excalidraw/excalidraw/types/element/textElement";
 
 export type Note = {
   id: string;
@@ -63,7 +62,10 @@ function App() {
     <Container className="my-4">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<NoteList availableTags={tags}/>} />
+          <Route
+            path="/"
+            element={<NoteList notes={notesWithTags} availableTags={tags} />}
+          />
           <Route
             path="/new"
             element={
