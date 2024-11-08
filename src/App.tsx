@@ -57,17 +57,23 @@ function App() {
     });
   };
 
-  const onUpdateNote = (id: string, {tags, ...data}: NoteData) => {
+  const onDeleteNote = (id: string) => {
     setNotes((prevNotes) => {
-      return prevNotes.map(note => {
-        if (note.id === id) {
-          return { ...note, ...data, tagIds: tags.map((tag) => tag.id) }
-        } else {
-          return note
-        }
-      })
+      return prevNotes.filter((note) => note.id !== id);
     });
-  }
+  };
+
+  const onUpdateNote = (id: string, { tags, ...data }: NoteData) => {
+    setNotes((prevNotes) => {
+      return prevNotes.map((note) => {
+        if (note.id === id) {
+          return { ...note, ...data, tagIds: tags.map((tag) => tag.id) };
+        } else {
+          return note;
+        }
+      });
+    });
+  };
 
   const addTag = (tag: Tag) => {
     setTags((prev) => [...prev, tag]);
@@ -92,7 +98,7 @@ function App() {
             }
           />
           <Route path="/:id" element={<NoteLayout notes={notesWithTags} />}>
-            <Route index element={<Note />} />
+            <Route index element={<Note onDelete={onDeleteNote} />} />
             <Route
               path="edit"
               element={
