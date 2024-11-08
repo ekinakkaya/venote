@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Button, Col, Row, Stack, Form, Card, Badge } from "react-bootstrap";
+import { Button, Col, Row, Stack, Form, Card, Badge, Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import ReactSelect from "react-select";
 import { Note, Tag } from "./App";
@@ -9,6 +9,12 @@ import styles from "./NoteList.module.css";
 type NoteListProps = {
   availableTags: Tag[];
   notes: Note[];
+};
+
+type EditTagsModalProps = {
+  show: boolean;
+  availableTags: Tag[];
+  handleClose: () => void
 };
 
 type SimplifiedNote = {
@@ -97,6 +103,8 @@ export function NoteList({ availableTags, notes }: NoteListProps) {
           </Col>
         ))}
       </Row>
+
+      <EditTagsModel show={} handleClose={} availableTags={availableTags}/>
     </>
   );
 }
@@ -130,3 +138,29 @@ const NoteCard = ({ id, title, tags }: SimplifiedNote) => {
     </Card>
   );
 };
+
+const EditTagsModel = ({availableTags, show, handleClose}: EditTagsModalProps) => {
+  return <Modal show={show} onHide={handleClose}>
+    <Modal.Header closeButton>
+      <Modal.Title>
+        Edit Tags
+      </Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      <Form>
+        <Stack gap={2}>
+          {availableTags.map(tag => (
+            <Row key={tag.id}>
+              <Col>
+                <Form.Control type="text" value="tag.label"/>
+              </Col>
+              <Col xs="auto">
+                <Button variant="outline-danger">&times;</Button>
+              </Col>
+            </Row>
+          ))}
+        </Stack>
+      </Form>
+    </Modal.Body>
+  </Modal>
+}
